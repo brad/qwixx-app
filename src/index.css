@@ -12,6 +12,10 @@ body {
   font-size: 2vw;
 }
 
+body.portrait-mode-active {
+  overflow: hidden;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
