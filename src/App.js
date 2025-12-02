@@ -8,6 +8,7 @@ import ColorRows from './components/ColorRows';
 import DiceRow from './components/DiceRow';
 import ScoreRow from './components/ScoreRow';
 import StrikesRow from './components/StrikesRow';
+import Portrait from './components/Portrait';
 
 const scoring = [0, 1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78];
 const gameWidth = 1000;
@@ -112,7 +113,10 @@ const blankState = {
 }
 
 class QuixxScoreCard extends Component {
-  state = cloneDeep(blankState);
+  state = {
+    ...cloneDeep(blankState),
+    showPortraitBlocker: false,
+  };
   startingGameWidth = gameWidth;
   startingGameHeight = gameHeight;
 
@@ -132,12 +136,14 @@ class QuixxScoreCard extends Component {
     });
 
     // Rescale the card to fit on the screen if the size of the screen changes
-    window.addEventListener('resize', () => {
-      this.setState({ scaler: this.getScaler() });
-    });
+    window.addEventListener('resize', this.handleResize);
 
     // set the initial scaler for the game
-    this.setState({ scaler: this.getScaler() });
+    this.handleResize();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 
   /**
@@ -167,6 +173,23 @@ class QuixxScoreCard extends Component {
     }
 
     return scaler;
+  }
+
+  handleResize = () => {
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const isPortrait = windowWidth < windowHeight;
+
+    if (isPortrait) {
+      document.body.classList.add('portrait-mode-active');
+    } else {
+      document.body.classList.remove('portrait-mode-active');
+    }
+
+    this.setState({
+      scaler: this.getScaler(),
+      showPortraitBlocker: isPortrait,
+    });
   }
 
   /**
@@ -298,6 +321,7 @@ class QuixxScoreCard extends Component {
 
     return (
       <>
+        <Portrait show={this.state.showPortraitBlocker} />
         <AppBar onReset={this.handleReset} />
         <div 
           id='game-wrapper'
